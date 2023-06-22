@@ -19,13 +19,26 @@ package com.example.bluromatic.data
 import android.content.Context
 import android.net.Uri
 import androidx.work.Data
+import androidx.work.OneTimeWorkRequest
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
+import androidx.work.WorkManager
 import com.example.bluromatic.KEY_BLUR_LEVEL
 import com.example.bluromatic.KEY_IMAGE_URI
+import com.example.bluromatic.getImageUri
+import com.example.bluromatic.workers.BlurWorker
+import com.example.bluromatic.workers.CleanupWorker
+import com.example.bluromatic.workers.saveImageToFileExplorer
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import javax.inject.Inject
 
-class WorkManagerBluromaticRepository(context: Context) : BluromaticRepository {
+class WorkManagerBluromaticRepository @Inject constructor(
+    context: Context
+) : BluromaticRepository {
+
+    private val workManager = WorkManager.getInstance(context)
+    private val imageUri: Uri = context.getImageUri()
 
     override val outputWorkInfo: Flow<WorkInfo?> = MutableStateFlow(null)
 
@@ -33,7 +46,20 @@ class WorkManagerBluromaticRepository(context: Context) : BluromaticRepository {
      * Create the WorkRequests to apply the blur and save the resulting image
      * @param blurLevel The amount to blur the image
      */
-    override fun applyBlur(blurLevel: Int) {}
+    override fun applyBlur(blurLevel: Int) {
+        //creating a work request
+        //creating chain of work
+        var continuation = workManager.beginWith(OneTimeWorkRequest.Companion.from(CleanupWorker::class.java))
+        val blurBuilder = OneTimeWorkRequestBuilder<BlurWorker>()
+        blurBuilder.setInputData(createInputDataForWorkRequest(blurLevel, imageUri))
+        //start the work
+       // workManager.enqueue(blurBuilder.build())
+        continuation = continuation.then(blurBuilder.build())
+
+        val save = OneTimeWorkRequestBuilder<saveImageToFileExplorer>().build()
+        continuation = continuation.then(save)
+        continuation.enqueue()
+    }
 
     /**
      * Cancel any ongoing WorkRequests

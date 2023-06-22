@@ -24,3 +24,9 @@ interface BluromaticRepository {
     fun applyBlur(blurLevel: Int)
     fun cancelWork()
 }
+
+/**
+ * Worker = define the actual work
+ * WorkRequest = request work/Include coroutine workers and work Constraints
+ * WorkManager = schedule the workRequest
+ */
