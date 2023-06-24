@@ -33,7 +33,6 @@ class BlurWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(ctx, 
                     errorMessage
                 }
                 val revolver = applicationContext.contentResolver
-                delay(DELAY_TIME_MILLIS)
                 val picture = BitmapFactory.decodeStream(
                     revolver.openInputStream(Uri.parse(resourceUri))
                 )

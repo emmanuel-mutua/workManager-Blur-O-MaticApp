@@ -20,7 +20,7 @@ private const val TAG = "SaveImageToFileExplorer"
 class saveImageToFileExplorer(ctx:Context, params: WorkerParameters): CoroutineWorker(ctx, params) {
     private val title = "Blurred Image"
     private val dateFormatter = SimpleDateFormat(
-        "yyyy.MM.dd at HH.mm.ss z", Locale.getDefault()
+        "yyyy.MM.dd 'at' hh.mm.ss z", Locale.getDefault()
     )
     override suspend fun doWork(): Result {
         makeStatusNotification(

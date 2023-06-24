@@ -18,9 +18,10 @@ package com.example.bluromatic.data
 
 import androidx.work.WorkInfo
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 interface BluromaticRepository {
-    val outputWorkInfo: Flow<WorkInfo?>
+    val outputWorkInfo: Flow<WorkInfo>
     fun applyBlur(blurLevel: Int)
     fun cancelWork()
 }
